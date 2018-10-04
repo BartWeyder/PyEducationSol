@@ -1,0 +1,49 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>e7507039-a6fc-462a-a3a1-921a9a7ed57c</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>generate_txt.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>PNN</Name>
+    <RootNamespace>PNN</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="generate_txt.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="mnist.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PNN.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="classes.csv" />
+    <Content Include="examples.csv" />
+    <Content Include="t10k-images-idx3-ubyte.gz" />
+    <Content Include="t10k-labels-idx1-ubyte.gz" />
+    <Content Include="train-images-idx3-ubyte.gz" />
+    <Content Include="train-labels-idx1-ubyte.gz" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>
