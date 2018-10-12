@@ -1,0 +1,31 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>{{ title }}.</h2>
+<h3>{{ message }}</h3>
+
+<p>Upload file and get forecast.<br />Start sales quantity and start date fields are optional</p>
+<form method=post enctype=multipart/form-data>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-upload"></i></span>
+        <input id="file" type="file" name="file" class="form-control" required placeholder="XLSX File">
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i><!--Start Date--></span>
+        <input id="start_date" type="month" class="form-control" name="start_date" 
+               placeholder="Start date for Forecast" />
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-briefcase"></i><!--Start sales--></span>
+        <input id="start_quantity" type="number" name="start_quantity" class="form-control" required 
+               min="5" placeholder="Start sales quantity for Forecast">
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-briefcase"></i><!--Start sales--></span>
+        <input id="period" type="number" name="period" class="form-control" required
+               min="24" placeholder="Time period for forecast in Months">
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+{% endblock %}

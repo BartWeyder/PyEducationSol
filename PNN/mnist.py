@@ -43,6 +43,9 @@ test_labels = test_labels[:test_count]
 train_images = train_images[:train_count].reshape(-1, 28 * 28) / 255.0
 test_images = test_images[:test_count].reshape(-1, 28 * 28) / 255.0
 
+print(recognize(train_images[1]))
+print(train_labels[1])
+
 result = []
 
 # this loop writes output of recognition to csv file
