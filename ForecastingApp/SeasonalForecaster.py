@@ -19,7 +19,6 @@ class SeasonalForecaster(Forecaster.Forecaster):
 			self.get_seasonal_coeffs()
 		
 		forecast_data = pd.DataFrame(columns=("Predicted quantity", "Date"))
-		print(len(forecast_data["Predicted quantity"]))
 		forecast_data.loc[0] = [self.__start_quantity, self.__start_date]
 		current_date = self.__start_date + pd.DateOffset(months=1)
 
@@ -32,6 +31,25 @@ class SeasonalForecaster(Forecaster.Forecaster):
 		self.__proc_data = forecast_data
 		return forecast_data
 
+	def forecast_lin(self):
+		if self.__seasonal_coeffs is None:
+			self.get_seasonal_coeffs_cleared()
+		
+		fitted_coeffs = np.polyfit(range(1, len(self.__raw_data[0]) + 1), self.__raw_data[0], 1)
+		forecast_data = pd.DataFrame(columns=("Predicted quantity", "Date"))
+		forecast_data.loc[0] = [self.__start_quantity, self.__start_date]
+		current_date = self.__start_date + pd.DateOffset(months=1)
+
+		for i in range(1, self.__forecast_period + 1):
+			forecast_data.loc[i] = [(i * fitted_coeffs[0] + self.__start_quantity) * \
+				self.__seasonal_coeffs[current_date.month - 1], current_date]
+			current_date += pd.DateOffset(months=1)
+
+		forecast_data["Date"] = pd.to_datetime(forecast_data["Date"], format="%m-%Y")
+		self.__proc_data = forecast_data
+		return forecast_data
+
+
 	def export_to_csv(self):
 		raise NotImplementedError()
 
@@ -41,7 +59,7 @@ class SeasonalForecaster(Forecaster.Forecaster):
 	def seasonal_coeffs(self):
 		return self.__seasonal_coeffs
 
-	def get_seasonal_coeffs(self):
+	def get_seasonal_coeffs_cleared(self):
 		fitted_coeffs = np.polyfit(range(1, len(self.__raw_data[0]) + 1), self.__raw_data[0], 1)
 		trend_values = []
 		diff = []
@@ -61,6 +79,25 @@ class SeasonalForecaster(Forecaster.Forecaster):
 			self.__seasonal_coeffs = np.append(cleared_mean[difference:], cleared_mean[:difference])
 		else: 
 			self.__seasonal_coeffs = cleared_mean
+
+		return self.__seasonal_coeffs
+
+	def get_seasonal_coeffs(self):
+		fitted_coeffs = np.polyfit(range(1, len(self.__raw_data[0]) + 1), self.__raw_data[0], 1)
+		diff = [0]
+		for i in range(1, len(self.__raw_data[0])):
+			diff.append(self.__raw_data[0][i] / self.__raw_data[0][i - 1])
+
+		#calculating mean for every month
+		mean_by_monthes = np.zeros(12)
+		for i in range(12):
+			mean_by_monthes[i] = np.mean(diff[i::12])
+
+		if self.__start_month > 1:
+			difference = 12 - self.__start_month + 1
+			self.__seasonal_coeffs = np.append(mean_by_monthes[difference:], mean_by_monthes[:difference])
+		else: 
+			self.__seasonal_coeffs = mean_by_monthes
 
 		return self.__seasonal_coeffs
 

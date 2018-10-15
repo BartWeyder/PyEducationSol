@@ -84,3 +84,43 @@ def seasonal_forecast():
 		year=datetime.now().year,
         message='Seasonal Forecast Form'
 	)
+
+@app.route('/seasonal-forecast-linear', methods=['GET', 'POST'])
+def seasonal_forecast_lin():
+	import SeasonalForecaster
+	import Parser
+
+
+	if request.method == 'POST':
+		# check if the post request has the file part
+		if 'file' not in request.files:
+			flash('No file part')
+			return redirect(request.url)
+		file = request.files['file']
+		if request.form['start_date']:
+			start_date = pd.Timestamp(request.form['start_date'])
+		else: start_date = pd.Timestamp.today()
+		if request.form['start_quantity']:
+			start_quantity = float(request.form['start_quantity'])
+		else: start_quantity = 400
+		if request.form['period']:
+			forecast_period = int(request.form['period'])
+		else: forecast_period = 24
+		# if user does not select file, browser also
+		# submit an empty part without filename
+		if file.filename == '':
+			flash('No selected file')
+			return redirect(request.url)
+		if file and allowed_file(file.filename):
+			f = SeasonalForecaster.SeasonalForecaster(Parser.Parser.xlsParseRawToSeasonalCoeffs(file), 
+										 start_quantity, forecast_period, start_date)
+			f.forecast_lin()
+			returnfilename = f.export_to_xlsx()
+			return send_file(app.config['GENERATED_FOLDER'] + returnfilename)
+
+	return render_template(
+		'seasonal-forecast.html',
+		title='Seasonal Forecast Linear',
+		year=datetime.now().year,
+        message='Seasonal Forecast Form'
+	)
