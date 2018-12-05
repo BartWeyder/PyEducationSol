@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+    <form action="/" method="post">
+        {{myform.hidden_tag()}}
+
+
+        {{myform.email.label}}
+        {{myform.email}}
+        <br />
+        {{myform.password.label}}
+        {{myform.password}}
+        <br />
+        {{myform.submit}}
+
+    </form>
+    <div>
+        <!--error section-->
+        Error list:
+        {%for error in myform.email.errors%}
+            {{error}}
+        {%endfor%}
+    </div>
+</body>
+</html>

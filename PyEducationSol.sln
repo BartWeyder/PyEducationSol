@@ -9,6 +9,16 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "AdamsMethod", "AdamsMethod\
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ForecastingApp", "ForecastingApp\ForecastingApp.pyproj", "{D6A38FFB-1B52-42C6-A7DF-9E1EEC22837B}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TwoLayerPersep", "TwoLayerPersep\TwoLayerPersep.pyproj", "{29E3EA06-9D8F-4A8F-B1F4-463EF731D2AF}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "EducationReviews", "FlaskWebProject1\EducationReviews.pyproj", "{F7B8DBDA-9748-4F21-A072-E9995FEECAFB}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "MathModeling", "MathModeling\MathModeling.pyproj", "{8DCFA492-A579-4802-936F-22F524DD81D1}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TestScripts", "TestScripts\TestScripts.pyproj", "{A6A526D1-4229-4F9B-99A2-6C0CF0B08B06}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Flasksession", "Flasksession\Flasksession.pyproj", "{6D75618B-4B63-4DBB-B9C8-ACFA29B911C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +33,20 @@ Global
 		{D6A38FFB-1B52-42C6-A7DF-9E1EEC22837B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6A38FFB-1B52-42C6-A7DF-9E1EEC22837B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6A38FFB-1B52-42C6-A7DF-9E1EEC22837B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29E3EA06-9D8F-4A8F-B1F4-463EF731D2AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29E3EA06-9D8F-4A8F-B1F4-463EF731D2AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B8DBDA-9748-4F21-A072-E9995FEECAFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7B8DBDA-9748-4F21-A072-E9995FEECAFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7B8DBDA-9748-4F21-A072-E9995FEECAFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B8DBDA-9748-4F21-A072-E9995FEECAFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DCFA492-A579-4802-936F-22F524DD81D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DCFA492-A579-4802-936F-22F524DD81D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6A526D1-4229-4F9B-99A2-6C0CF0B08B06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6A526D1-4229-4F9B-99A2-6C0CF0B08B06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D75618B-4B63-4DBB-B9C8-ACFA29B911C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D75618B-4B63-4DBB-B9C8-ACFA29B911C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D75618B-4B63-4DBB-B9C8-ACFA29B911C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D75618B-4B63-4DBB-B9C8-ACFA29B911C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
