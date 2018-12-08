@@ -3,7 +3,7 @@ Routes and views for the flask application.
 """
 
 from datetime import datetime, timedelta
-from flask import render_template, request, redirect, make_response, session, g
+from flask import render_template, request, redirect, make_response, session
 from EducationReviews import app
 import cx_Oracle
 from validators.credentials import check_credentials, check_hash

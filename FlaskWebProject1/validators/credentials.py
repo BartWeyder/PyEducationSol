@@ -4,13 +4,8 @@ from time import time
 from flask import session, request
 import cx_Oracle
 
-
-#username = 'kizim'
-#password = 'kizim'
-#databaseName = "localhost:1521/xe"
-
 def check_credentials(auth_array):
-	BOT_TOKEN = b"785636304:AAFl-095ihh8eOTr6grLYCHydPN0MacDbY4";
+	BOT_TOKEN = b"";
 	check_arr = ['id=' + auth_array[0], 'first_name=' + auth_array[1], 'last_name=' + auth_array[2],
 	   'username=' + auth_array[3], 'photo_url=' + auth_array[4], 'auth_date=' + auth_array[5]]
 	check_arr.sort()

@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a6a526d1-4229-4f9b-99a2-6c0cf0b08b06</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>TestScripts.py</StartupFile>
+    <StartupFile>PhasePortraits.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PhasePortraits.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TestScripts.py" />
     <Compile Include="Transportation.py">
       <SubType>Code</SubType>
