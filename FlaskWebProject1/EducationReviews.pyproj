@@ -29,6 +29,21 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dao\user_handle.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="dao\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="forms\ManageUsers.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="forms\UserForm.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="forms\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="runserver.py" />
     <Compile Include="EducationReviews\__init__.py" />
     <Compile Include="EducationReviews\views.py" />
@@ -40,7 +55,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="dao\" />
     <Folder Include="EducationReviews\" />
+    <Folder Include="forms\" />
     <Folder Include="EducationReviews\static\" />
     <Folder Include="EducationReviews\static\content\" />
     <Folder Include="EducationReviews\static\fonts\" />
@@ -55,6 +72,7 @@
     <Content Include="EducationReviews\templates\me.html" />
     <Content Include="EducationReviews\templates\postform.html" />
     <Content Include="EducationReviews\templates\userform.html" />
+    <Content Include="EducationReviews\templates\users.html" />
     <Content Include="requirements.txt" />
     <Content Include="EducationReviews\static\content\bootstrap.css" />
     <Content Include="EducationReviews\static\content\bootstrap.min.css" />

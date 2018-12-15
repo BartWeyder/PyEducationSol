@@ -1,13 +1,9 @@
-﻿<!DOCTYPE html>
+﻿{% extends "layout.html" %}
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
-    <h1>ERROR 404</h1>
-    <p>What: {{error}}</p>
-    
-</body>
-</html>
+{% block content %}
+
+<h1>ERROR 404</h1>
+<div class="alert alert-danger">What: {{error}}</div>
+<a href="/" class="btn btn-success">Back to main page</a>
+
+{% endblock %}

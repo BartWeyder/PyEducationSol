@@ -2,10 +2,10 @@ import hmac
 import hashlib
 from time import time
 from flask import session, request
-import cx_Oracle
+from dao.user_handle import filter_users
 
 def check_credentials(auth_array):
-	BOT_TOKEN = b"";
+	BOT_TOKEN = b"785636304:AAFl-095ihh8eOTr6grLYCHydPN0MacDbY4";
 	check_arr = ['id=' + auth_array[0], 'first_name=' + auth_array[1], 'last_name=' + auth_array[2],
 	   'username=' + auth_array[3], 'photo_url=' + auth_array[4], 'auth_date=' + auth_array[5]]
 	check_arr.sort()
@@ -19,28 +19,29 @@ def check_credentials(auth_array):
 		return 2
 	return 0
 
-def check_hash(connection):
+def check_hash():
 	
 	if 'key' in session:
-		hash = session['key']
+		hash_ = session['key']
 	else:
-		hash = request.cookies.get("educationreview_credits")
-		if hash == None:
+		hash_ = request.cookies.get("educationreview_credits")
+		if hash_ == None:
 			return False
-	
-	cursor = connection.cursor()
 
-	query = "select * from TABLE(USER_HANDLE.filter_users(NULL, NULL, '%s'))" % hash
-	user_record = cursor.execute(query).fetchone()
+	user_record = filter_users(None, None, hash_)
 
-	cursor.close ()
 	if user_record != None:
-		logged = True
-		session['key'] = hash
+		session['key'] = hash_
 		return True
 	session.pop('key', None)
 	return False
 	
+def get_role():
 
+	hash_ = session['key']
+	user_record = filter_users(None, None, hash_)[0]
+	if user_record != None:
+		return user_record[1]
+	return None
 
 

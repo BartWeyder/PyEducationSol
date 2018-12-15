@@ -1,0 +1,37 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Users</h1>
+<h2>Filters</h2>
+<form action="{{url_for('manage_users')}}" method="post">
+    <fieldset>
+        {{form.hidden_tag()}}
+        {{form.name.label}} {{form.name}} <br />
+        {{form.role.label}} {{form.role}} <br />
+        {{form.submit}}
+    </fieldset>
+</form>
+<table>
+    <tr>
+        <th>Name</th><th>Role</th><th>Registered</th><th>Actions</th>
+    </tr>
+    {% for user in data %}
+        <tr>
+            <td>{{user[2]}}</td>
+            <td>{{user[1]}}</td>
+            <td>{{user[4]}}</td>
+            <td>
+                <!--<a href="/user/{{user[0]}}" class="btn btn-primary">View</a>-->
+                <a href="{{url_for('manage_users_edit', uid=user[0], from=request.path, args=request.query_string)}}" class="btn btn-warning">Edit</a>
+                {% if user[5] == 1 %}
+                    <a href="{{url_for('manage_users_block', uid=user[0], from=request.path, args=request.query_string)}}" class="btn btn-danger">Block</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+
+</table>
+
+
+{% endblock %}
