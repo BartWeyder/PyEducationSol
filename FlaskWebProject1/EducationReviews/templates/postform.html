@@ -1,29 +1,14 @@
-﻿<!DOCTYPE html>
+﻿{% extends "layout.html" %}
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
-    <div class="row">
-        <form method=post enctype=multipart/form-data>
-            PID:<br>
-            <input type="text" name="PID" , value="{{ U["PID"] }}"><br>
-            PHONE:<br>
-            <input type="text" name="PHONE" , value="{{U["PHONE"]}}"><br>
-            POSTTITLE:<br>
-            <input type="text" name="POSTTITLE" , value="{{ U["POSTTITLE"] }}"><br>
-            POSTTEXT:<br>
-            <input type="text" name="POSTTEXT" , value="{{U["POSTTEXT"]}}"><br>
-            PUBLISHED:<br>
-            <input type="text" name="PUBLISHED" , value="{{U["PUBLISHED"]}}"><br>
-            POSTCREATEDTIME:<br>
-            <input type="text" name="POSTCREATEDTIME" , value="{{U["POSTCREATEDTIME"]}}"><br>
-            CATEGORYTITLE:<br>
-            <input type="text" name="CATEGORYTITLE" , value="{{U["CATEGORYTITLE"]}}"><br>
-            <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-    </div>
-</body>
-</html>
+{% block content %}
+<form method=post enctype=multipart/form-data>
+    <fieldset>
+        {{form.hidden_tag()}}
+        {{form.title.label}} {{form.title}} <br />
+        {{form.text.label}} {{form.text}} <br />
+        {{form.category.label}} {{form.category}} <br />
+        {{form.submit}}
+    </fieldset>
+</form>
+
+{% endblock %}

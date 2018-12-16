@@ -98,3 +98,6 @@ def block_user(id):
 	finally:
 		cursor.close()
 		connection.close()
+
+def user_by_hash(hash_):
+	return filter_users(None, None, hash_)[0]

@@ -1,17 +1,19 @@
 import cx_Oracle
 from dao.credentials import username, password, databaseName
+from dao.category_handle import filter_categories
 
 def add_post(uid, title, text, category):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
 	try:
-		cursor.callproc("POST_HANDLE.add_post", [uid, title, text, category])
+		pid = cursor.callfunc("POST_HANDLE.add_post", cx_Oracle.NUMBER, [uid, title, text, category])
 		connection.commit()
 	except:
 		raise
 	finally:
 		cursor.close()
 		connection.close()
+	return pid
 
 def edit_post(pid, title, text, category):
 	connection = cx_Oracle.connect(username, password, databaseName)
@@ -41,7 +43,7 @@ def publicate_post(pid):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
 	try:
-		cursor.callproc("POST_HANDLE.publicate_post", [pid])
+		cursor.callproc("POST_HANDLE.set_status", [pid, 1])
 		connection.commit()
 	except:
 		raise
@@ -53,7 +55,19 @@ def hide_post(pid):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
 	try:
-		cursor.callproc("POST_HANDLE.hide_post", [pid])
+		cursor.callproc("POST_HANDLE.set_status", [pid, 0])
+		connection.commit()
+	except:
+		raise
+	finally:
+		cursor.close()
+		connection.close()
+
+def remove_post(pid):
+	connection = cx_Oracle.connect(username, password, databaseName)
+	cursor = connection.cursor()
+	try:
+		cursor.callproc("POST_HANDLE.set_status", [pid, 2])
 		connection.commit()
 	except:
 		raise
@@ -96,12 +110,12 @@ def get_post(pid):
 
 	return post
 
-def filter_posts(uid, title, text, category):
-	query = "select * from TABLE(POST_HANDLE.filter_posts(:uid, :title, :text, :category))" 
+def filter_posts(uid_, title_, text_, category_, status_):
+	query = "select * from TABLE(POST_HANDLE.filter_posts(:uid_, :title_, :text_, :category_, :status_))" 
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
 	try:
-		cursor.execute(query, uid=uid, title=title, text=text, category=category)
+		cursor.execute(query, uid_=uid_, title_=title_, text_=text_, category_=category_, status_=status_)
 		data = cursor.fetchall()
 	except:
 		raise
@@ -123,3 +137,10 @@ def get_post_tags(pid):
 		cursor.close()
 		connection.close()
 	return data
+
+def get_all():
+	categories = filter_categories(None)
+	category_list = []
+	for category in categories:
+		category_list.append((category[0], category[0]))
+	return category_list
