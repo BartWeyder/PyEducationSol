@@ -1,0 +1,34 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Tags</h1>
+<h2>Filters</h2>
+<form action="{{url_for('manage_tag')}}" method="post">
+    <fieldset>
+        {{form.hidden_tag()}}
+        {{form.title.label}} {{form.title}}
+        {{form.submit}}
+    </fieldset>
+</form>
+
+<a href="{{url_for('manage_tag_add')}}" class="btn btn-success">Add New Tag</a>
+
+<table>
+    <tr>
+        <th>Tag Title</th>
+    </tr>
+    {% for rec in data %}
+    <tr>
+        <td>{{rec[0]}}</td>
+
+        <td>
+            <a href="{{url_for('manage_tag_delete', title=rec[0], args=request.query_string)}}" class="btn btn-warning">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+
+{% endblock %}

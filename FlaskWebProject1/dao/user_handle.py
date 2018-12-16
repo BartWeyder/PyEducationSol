@@ -1,8 +1,5 @@
 import cx_Oracle
-
-username = 'kizim'
-password = 'kizim'
-databaseName = "localhost:1521/xe"
+from dao.credentials import username, password, databaseName
 
 def get_user(id):
 	if not id: return None

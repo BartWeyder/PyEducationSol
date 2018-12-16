@@ -1,0 +1,13 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+<h1>Add New Tag</h1>
+<form method=post enctype=multipart/form-data>
+    <fieldset>
+        {{form.hidden_tag()}}
+        {{form.title.label}} {{form.title}} <br />
+        {{form.submit}}
+    </fieldset>
+</form>
+
+{% endblock %}

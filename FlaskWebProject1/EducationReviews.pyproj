@@ -29,13 +29,31 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dao\category_handle.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="dao\credentials.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="dao\post_handle.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="dao\tag_handle.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="dao\user_handle.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="dao\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="forms\CategoryForm.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="forms\ManageUsers.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="forms\TagForm.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="forms\UserForm.py">
@@ -68,9 +86,13 @@
   <ItemGroup>
     <Content Include="EducationReviews\templates\404.html" />
     <Content Include="EducationReviews\templates\all.html" />
+    <Content Include="EducationReviews\templates\category.html" />
+    <Content Include="EducationReviews\templates\categoryform.html" />
     <Content Include="EducationReviews\templates\login.html" />
     <Content Include="EducationReviews\templates\me.html" />
     <Content Include="EducationReviews\templates\postform.html" />
+    <Content Include="EducationReviews\templates\tag.html" />
+    <Content Include="EducationReviews\templates\tagform.html" />
     <Content Include="EducationReviews\templates\userform.html" />
     <Content Include="EducationReviews\templates\users.html" />
     <Content Include="requirements.txt" />

@@ -4,10 +4,15 @@ Routes and views for the flask application.
 
 from datetime import datetime, timedelta
 from forms.UserForm import UserForm
+from forms.CategoryForm import CategoryForm
+from forms.TagForm import TagForm
 from flask import render_template, request, redirect, make_response, session, flash, url_for
 from EducationReviews import app
 import cx_Oracle
 import dao.user_handle as uh
+import dao.post_handle as ph
+import dao.category_handle as ch
+import dao.tag_handle as th
 from forms.ManageUsers import ManageUsers
 from validators.credentials import check_credentials, check_hash, get_role
 import json
@@ -167,3 +172,115 @@ def manage_users_block(uid):
 		flash("User blocked")
 		return redirect(from_url + '?' + args)
 	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/category', methods = ["GET", "POST"])
+def manage_category():
+	if check_hash() and get_role() == 'superuser':
+		if request.method == "GET":
+			form = CategoryForm()
+			title = request.args.get('title')
+			if title: form.title.data = title
+
+			data = ch.filter_categories(title)
+			return render_template('category.html', data = data, form=form)
+
+		if request.method == "POST":
+			response = make_response(redirect(url_for('manage_category', title=request.form['title'])))
+			flash("Filters applied")
+			return response
+
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/category/add', methods = ["GET", "POST"])
+def manage_category_add():
+	if check_hash() and get_role() == 'superuser':
+		if request.method == "GET":
+			form = CategoryForm()
+			return render_template('categoryform.html', form=form)
+
+		if request.method == "POST":
+			try:
+				ch.add_category(request.form['title'])
+			except:
+				return render_template('404.html', error = 'Something went wrong while creation')
+			response = make_response(redirect(url_for('manage_category')))
+			flash("Category added")
+			return response
+
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/category/delete/<title>', methods = ["GET"])
+def manage_category_delete(title):
+	if check_hash() and get_role() == 'superuser':
+		try:
+			ch.delete_category(title)
+		except:
+			return render_template('404.html', error = 'Something went wrong while deletion')
+		args = request.args.get('args')
+		response = make_response(redirect(url_for('manage_category') + '?' + args))
+		flash("Category deleted")
+		return response
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/tag', methods = ["GET", "POST"])
+def manage_tag():
+	if check_hash() and get_role() in ('superuser', 'moderator'):
+		if request.method == "GET":
+			form = CategoryForm()
+			title = request.args.get('title')
+			if title: form.title.data = title
+
+			try:
+				data = th.filter_tags(title)
+			except:
+				return render_template('404.html', error = 'Can not get information :(')
+			return render_template('tag.html', data = data, form=form)
+
+		if request.method == "POST":
+			response = make_response(redirect(url_for('manage_tag', title=request.form['title'])))
+			flash("Filters applied")
+			return response
+
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/tag/add', methods = ["GET", "POST"])
+def manage_tag_add():
+	if check_hash() and get_role() == 'superuser':
+		if request.method == "GET":
+			form = TagForm()
+			return render_template('tagform.html', form=form)
+
+		if request.method == "POST":
+			try:
+				th.add_tag(request.form['title'])
+			except:
+				return render_template('404.html', error = 'Something went wrong while creation')
+			response = make_response(redirect(url_for('manage_tag')))
+			flash("Tag added")
+			return response
+
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/tag/delete/<title>', methods = ["GET"])
+def manage_tag_delete(title):
+	if check_hash() and get_role() == 'superuser':
+		try:
+			th.delete_tag(title)
+		except:
+			return render_template('404.html', error = 'Something went wrong while deletion')
+		args = request.args.get('args')
+		response = make_response(redirect(url_for('manage_tag') + '?' + args))
+		flash("Tag deleted")
+		return response
+	return render_template('404.html', error = 'You have no rights for this action')
+#@app.route('/post/add', methods = ["GET", "POST"])
+#def add_post():
+#	if check_hash():
+#		if request.method == "GET":
+#			return
+#		if request.method == "POST":
+#			try:
+#				user_id = uh.filter_users(None, None, session['key'])[0][0]
+#				ph.add_post(user_id, request.form['title'], request.form['text'], request.form['category'])
+
+#	return redirect('/login')
