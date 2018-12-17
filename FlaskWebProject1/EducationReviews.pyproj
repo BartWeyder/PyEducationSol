@@ -48,6 +48,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="forms\AddTagForm.py" />
+    <Compile Include="forms\AnswerForm.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="forms\CategoryForm.py">
       <SubType>Code</SubType>
     </Compile>
