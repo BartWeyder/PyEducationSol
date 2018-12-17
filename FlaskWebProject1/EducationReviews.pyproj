@@ -29,6 +29,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dao\answer_handle.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="dao\category_handle.py">
       <SubType>Code</SubType>
     </Compile>

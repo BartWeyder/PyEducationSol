@@ -28,7 +28,7 @@
             <a href="{{ url_for('remove_tag_from_post', pid=post[0], tag=tag[0]) }}" class="btn btn-primary">Remove</a>
         </td>
     </tr>
-    
+
     {% endfor %}
 
 
@@ -42,15 +42,45 @@
 </form>
 {% endif %}
 
-{% if answer_form %}
+{% if answer %}
+<h2>Answer by <i>{{answer[1]}}</i></h2>
+<p><i>Created: {{answer[5]}}</i></p>
 
-<h2 name="answer">Add Answer</h2>
-<form action="{{url_for('add_answer', pid=pid)}}" method="post">
-    {{answer_form.hidden_tag()}}
-    {{answer_form.title.label}} {{answer_form.title}} <br />
-    {{answer_form.text.label}} {{answer_form.text}} <br />
-    {{answer_form.submit}}
-</form> 
+
+    {% if answer_form %}
+
+    <h2 name="answer">Add Answer</h2>
+    <form action="{{url_for('add_answer', pid=post[0])}}" method="post">
+        {{answer_form.hidden_tag()}}
+        {{answer_form.title.label}} {{answer_form.title}} <br />
+        {{answer_form.text.label}} {{answer_form.text}} <br />
+        {{answer_form.submit}}
+        <a href="{{url_for('remove_answer', aid=answer[0])}}" class="btn btn-danger">Remove</a>
+    </form>
+
+    {% else %}
+
+        {% if answer[3] %}
+<h3>{{answer[3]}}</h3>
+        {% endif %}
+
+<p>{{answer[4]}}</p>
+
+    {% endif %}
+
+{% else %}
+
+    {% if answer_form %}
+
+    <h2 name="answer">Add Answer</h2>
+    <form action="{{url_for('add_answer', pid=post[0])}}" method="post">
+        {{answer_form.hidden_tag()}}
+        {{answer_form.title.label}} {{answer_form.title}} <br />
+        {{answer_form.text.label}} {{answer_form.text}} <br />
+        {{answer_form.submit}}
+    </form>
+
+    {% endif %}
 
 {% endif %}
 

@@ -17,6 +17,7 @@ import dao.user_handle as uh
 import dao.post_handle as ph
 import dao.category_handle as ch
 import dao.tag_handle as th
+import dao.answer_handle as ah
 from forms.ManageUsers import ManageUsers
 from validators.credentials import check_credentials, check_hash, get_role
 import json
@@ -461,16 +462,26 @@ def view_post(pid):
 	if request.method == "GET":
 		data = None
 		author = None
+		answer = None
 		try:
 			data = ph.get_post(pid)
 			author = uh.get_user(data[1])[2]
 			tags = ph.get_post_tags(pid)
-			# add answer later
+			answer = ah.filter_answers(None, None, pid, None)
+			if answer:
+				answer = answer[0]
+				if answer_form:
+					answer_form.title.data = answer[3]
+					answer_form.text.data = answer[4]
+				l = list(answer)
+				l[1] = uh.get_user(l[1])[2]
+				answer = tuple(l)
+
 		except:
 			return render_template('404.html', error='Error while getting info')
-		if data[4] != 1 and get_role() == 'user':
+		if data[4] != 1 and role == 'user':
 			return render_template('404.html', error = 'Post not found')
-		return render_template('post.html', post=data, author=author, tags=tags, 
+		return render_template('post.html', post=data, author=author, tags=tags, answer=answer,
 						 answer_form=answer_form, tag_form=tag_form)
 
 	if request.method == "POST":
@@ -546,4 +557,27 @@ def add_answer(pid):
 
 			return render_template('answerform.html', form=form, data=post)
 		if request.method == 'POST':
-			return 
+			try:
+				author = uh.user_by_hash(session['key'])[0]
+				ah.add_answer(author, pid, request.form['title'], request.form['text'])
+			except:
+				return render_template('404.html', error = 'Error while adding answer')
+			flash('Answer successfully added')
+			return redirect(url_for('view_post', pid=pid))
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/answer/remove/<aid>', methods=['GET'])
+def remove_answer(aid):
+	role = get_role()
+	if check_hash() and (role == 'superuser' or role == 'moderator'):
+		pid = None
+		try:
+			pid = ah.get_answer(aid)[1]
+			ah.delete_answer(aid)
+		except:
+			return render_template('404.html', error = 'Error while deleting answer')
+		flash('Answer successfully deleted')
+		if pid == None: return redirect('/')
+		return redirect(url_for('view_post', pid=pid))
+	return render_template('404.html', error = 'You have no rights for this action')
+

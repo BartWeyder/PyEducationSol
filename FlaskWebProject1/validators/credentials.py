@@ -37,11 +37,10 @@ def check_hash():
 	return False
 	
 def get_role():
-
-	hash_ = session['key']
-	user_record = filter_users(None, None, hash_)[0]
-	if user_record != None:
-		return user_record[1]
+	hash_ = '0'
+	if 'key' in session:
+		hash_ = session['key']
+	user_record = filter_users(None, None, hash_)
+	if user_record:
+		return user_record[0][1]		
 	return None
-
-
