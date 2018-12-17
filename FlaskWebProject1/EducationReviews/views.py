@@ -8,6 +8,8 @@ from forms.CategoryForm import CategoryForm
 from forms.TagForm import TagForm
 from forms.PostForm import PostForm
 from forms.MangePosts import ManagePosts
+from forms.AddTagForm import AddTagForm
+from forms.AnswerForm import AnswerForm
 from flask import render_template, request, redirect, make_response, session, flash, url_for
 from EducationReviews import app
 import cx_Oracle
@@ -294,7 +296,6 @@ def add_post():
 	if check_hash():
 		form = PostForm()
 		
-		#form.category.choices = category_list
 		if request.method == "GET":
 			return render_template('postform.html', form=form)
 		if request.method == "POST":
@@ -304,7 +305,7 @@ def add_post():
 				try:
 					user_id = uh.filter_users(None, None, session['key'])[0][0]
 					pid = ph.add_post(user_id, request.form['title'], request.form['text'], request.form['category'])
-					return redirect(url_for('view_post', pid=pid))
+					return redirect(url_for('manage_tags', pid=pid))
 				except:
 					return render_template('404.html', error="Error while creation")
 			
@@ -332,9 +333,7 @@ def manage_posts():
 				
 		
 		if request.method == "POST":
-#if form.validate():
 			try:
-				
 				categories = ch.filter_categories(None)
 				category_list = []
 				for category in categories:
@@ -352,11 +351,6 @@ def manage_posts():
 				new_data = []
 				for rec in data:
 					new_data.append((rec[0], uh.get_user(rec[1])[2], rec[2], rec[3],rec[4],rec[5],rec[6]))
-				
-				
-
-				#for rec in data:
-				#	rec[1] = uh.get_user(rec[1])[2]
 
 				form.author.data = request.form['author']
 				form.category.data = request.form['category']
@@ -365,7 +359,6 @@ def manage_posts():
 				return render_template('posts.html', form=form, role=role, data=new_data)
 			except:
 				return render_template('404.html', error = 'Cant load information')
-		#return render_template('404.html', error="Validation violated")
 
 	return render_template('404.html', error = 'You have no rights for this action')
 
@@ -447,9 +440,69 @@ def view_post(pid):
 		try:
 			data = ph.get_post(pid)
 			author = uh.get_user(data[1])[2]
+			tags = ph.get_post_tags(pid)
 		except:
 			return render_template('404.html', error='Error while getting info')
 		if data[4] != 1 and get_role() == 'user':
 			return render_template('404.html', error = 'Post not found')
-		return render_template('post.html', post=data, author=author)
+		return render_template('post.html', post=data, author=author, tags=tags)
 	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/post/<pid>/tags', methods=["GET", "POST"])
+def manage_tags(pid):
+	if check_hash():
+		role = get_role()
+		if  (role == 'user' and ph.get_post(pid)[1] == uh.user_by_hash(session['key'])) or role=='moderator' or role=='superuser':
+			form = AddTagForm()
+			p_data = None
+			all_data = None
+			try:
+				p_data = ph.get_post_tags(pid)
+				all_data = th.filter_tags(None)
+			except:
+				return render_template('404.html', error='Error while getting info')
+
+			data = [value for value in all_data if value not in p_data]
+			choices = []
+			for rec in data:
+				choices.append((rec[0], rec[0]))
+			form.tag.choices = choices	
+			if request.method == "GET":
+					return render_template('posttags.html', pid=pid, form=form, data=p_data)
+					
+			if request.method == "POST":
+				if form.validate():
+					try:
+						ph.add_tag_to_post(pid, request.form['tag'])
+					except:
+						return render_template('404.html', error='Error while adding tag')
+						
+					return redirect(url_for('manage_tags', pid=pid))
+
+				return render_template('404.html', error="Validation violated")
+
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/post/<pid>/remove/<tag>', methods = ['GET'])
+def remove_tag_from_post(pid, tag):
+	if check_hash():
+		role = get_role()
+		if  (role == 'user' and ph.get_post(pid)[1] == uh.user_by_hash(session['key'])) or role=='moderator' or role=='superuser':
+			try:
+				ph.delete_tag_from_post(pid, tag)
+			except:
+				return render_template('404.html', error = 'Error while deleting tag')
+			flash('Tag successfully deleted from post')
+			return redirect(url_for('manage_tags', pid=pid))
+
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/post/<pid>/add-answer', methods=["GET", "POST"])
+def add_answer(pid):
+	role = get_role()
+	if check_hash() and (role == 'superuser' or role == 'moderator'):
+
+		if request.method == "GET":
+			return render_template('answerform.html', form=form)
+		if request.method == 'POST':
+			return

@@ -47,6 +47,7 @@
     <Compile Include="dao\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="forms\AddTagForm.py" />
     <Compile Include="forms\CategoryForm.py">
       <SubType>Code</SubType>
     </Compile>
@@ -99,6 +100,7 @@
     <Content Include="EducationReviews\templates\post.html" />
     <Content Include="EducationReviews\templates\postform.html" />
     <Content Include="EducationReviews\templates\posts.html" />
+    <Content Include="EducationReviews\templates\posttags.html" />
     <Content Include="EducationReviews\templates\tag.html" />
     <Content Include="EducationReviews\templates\tagform.html" />
     <Content Include="EducationReviews\templates\userform.html" />

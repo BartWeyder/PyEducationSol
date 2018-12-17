@@ -1,0 +1,30 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Manage Tags</h1>
+
+<table>
+    <tr>
+        <th>Tag</th>
+    </tr>
+    {% for rec in data %}
+    <tr>
+        <td>{{rec[0]}}</td>
+        <td>
+            <a href="{{ url_for('remove_tag_from_post', pid=pid, tag=rec[0]) }}" class="btn btn-primary">Remove</a>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<form method=post>
+    <fieldset>
+        {{form.hidden_tag()}}
+        {{form.tag.label}} {{form.tag}} <br />
+        {{form.submit}}
+    </fieldset>
+</form>
+
+{% endblock %}
