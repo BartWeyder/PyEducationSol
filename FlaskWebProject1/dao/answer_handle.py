@@ -5,38 +5,32 @@ from dao.user_handle import filter_users
 def add_answer(user_id, pid_, answertitle, answertext):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callfunc("ANSWER_HANDLE.add_answer", cx_Oracle.NUMBER, [user_id, pid_, answertitle, answertext])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	answer_id = cursor.callfunc("ANSWER_HANDLE.add_answer", cx_Oracle.NUMBER, [status, user_id, pid_, answertitle, answertext])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return answer_id, status.getvalue()
 
 def edit_answer(aid, answertitle, answertext):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("ANSWER_HANDLE.edit_answer", [aid, answertitle, answertext])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("ANSWER_HANDLE.edit_answer", [status, aid, answertitle, answertext])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def delete_answer(aid):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("ANSWER_HANDLE.delete_answer", [aid])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("ANSWER_HANDLE.delete_answer", [status, aid])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def get_answer(aid):
 	if not aid: return None
@@ -49,7 +43,7 @@ def get_answer(aid):
 
 	return answer
 
-def filter_answers(title, user_id, pid, answertext):
+def filter_answers(title=None, user_id=None, pid=None, answertext=None):
 	query = "select * from TABLE(ANSWER_HANDLE.filter_answers(:title, :user_id, :pid, :answertext))" 
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()

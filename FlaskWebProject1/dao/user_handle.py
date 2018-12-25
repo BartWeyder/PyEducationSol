@@ -30,49 +30,41 @@ def filter_users(rolename, name, hash_):
 def add_user(id, name, hash_):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("USER_HANDLE.add_user", [id, 'user', name, hash_])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("USER_HANDLE.add_user", [status, id, 'user', name, hash_])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 	
 def edit_user(id, rolename, name, status):
-	connection = cx_Oracle.connect(username, password, databaseName)
+	connection = cx_Oracle.connect(status, username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("USER_HANDLE.edit_user", [id, rolename, name, status])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("USER_HANDLE.edit_user", [status, id, rolename, name, status])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def delete_user (id):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("USER_HANDLE.delete_user", [id])
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("USER_HANDLE.delete_user", [status, id])
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def update_hash(id, hash_):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("USER_HANDLE.update_hash", [id, hash_])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("USER_HANDLE.update_hash", [status, id, hash_])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def get_hash (id):
 	connection = cx_Oracle.connect(username, password, databaseName)
@@ -90,14 +82,22 @@ def get_hash (id):
 def block_user(id):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("USER_HANDLE.block_user", [id])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("USER_HANDLE.block_user", [status, id])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
+
+def unblock_user(id):
+	connection = cx_Oracle.connect(username, password, databaseName)
+	cursor = connection.cursor()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("USER_HANDLE.unblock_user", [status, id])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def user_by_hash(hash_):
 	return filter_users(None, None, hash_)[0]

@@ -22,10 +22,11 @@
             <td>{{user[1]}}</td>
             <td>{{user[4]}}</td>
             <td>
-                <!--<a href="/user/{{user[0]}}" class="btn btn-primary">View</a>-->
                 <a href="{{url_for('manage_users_edit', uid=user[0], from=request.path, args=request.query_string)}}" class="btn btn-warning">Edit</a>
-                {% if user[5] == 1 %}
-                    <a href="{{url_for('manage_users_block', uid=user[0], from=request.path, args=request.query_string)}}" class="btn btn-danger">Block</a>
+                {% if user[5] is none %}
+                <a href="{{url_for('manage_users_block', uid=user[0], from=request.path, args=request.query_string)}}" class="btn btn-danger">Block</a>
+                {% else %}
+                <a href="{{url_for('manage_users_unblock', uid=user[0], from=request.path, args=request.query_string)}}" class="btn btn-danger">Unblock</a>
                 {% endif %}
             </td>
         </tr>

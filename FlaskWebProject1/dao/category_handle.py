@@ -4,26 +4,22 @@ from dao.credentials import username, password, databaseName
 def add_category(title):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("CATEGORY_HANDLE.add_category", [title])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("CATEGORY_HANDLE.add_category", [status,title])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def delete_category(title):
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()
-	try:
-		cursor.callproc("CATEGORY_HANDLE.delete_category", [title])
-		connection.commit()
-	except:
-		raise
-	finally:
-		cursor.close()
-		connection.close()
+	status = cursor.var(cx_Oracle.STRING)
+	cursor.callproc("CATEGORY_HANDLE.delete_category", [status,title])
+	connection.commit()
+	cursor.close()
+	connection.close()
+	return status.getvalue()
 
 def get_category(title):
 	if not title: return None
@@ -36,7 +32,7 @@ def get_category(title):
 
 	return category
 
-def filter_categories(title):
+def filter_categories(title=None):
 	query = "select * from TABLE(CATEGORY_HANDLE.filter_categories(:title))" 
 	connection = cx_Oracle.connect(username, password, databaseName)
 	cursor = connection.cursor()

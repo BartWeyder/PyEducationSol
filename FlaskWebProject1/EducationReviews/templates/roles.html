@@ -1,0 +1,33 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Roles</h1>
+<h2>Add new</h2>
+<form action="{{url_for('manage_roles')}}" method="post">
+    <fieldset>
+        {{form.hidden_tag()}}
+        {{form.rolename.label}} {{form.rolename}}
+        {{form.submit}}
+    </fieldset>
+</form>
+
+<table>
+    <tr>
+        <th>Role</th>
+        <th>Action</th>
+    </tr>
+    {% for rec in data %}
+    <tr>
+        <td>{{rec[0]}}</td>
+
+        <td>
+            <a href="{{url_for('delete_role', rolename=rec[0])}}" class="btn btn-warning">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+
+{% endblock %}

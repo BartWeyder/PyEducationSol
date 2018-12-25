@@ -1,0 +1,17 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+{% for rec in data %}
+<div>
+    <a href="{{ url_for('manage_posts') }}" class="btn">Manage Posts</a>
+    {% if role == 'superuser' %}
+    <a href="{{ url_for('manage_roles') }}" class="btn">Manage Roles</a>
+    <a href="{{ url_for('manage_category') }}" class="btn">Manage Categories</a>
+    {% endif %}
+    <a href="{{ url_for('manage_tag') }}" class="btn">Manage Tags</a>
+
+</div>
+{% endfor %}
+
+{% endblock %}

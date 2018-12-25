@@ -50,7 +50,7 @@
     {% if answer_form %}
 
     <h2 name="answer">Add Answer</h2>
-    <form action="{{url_for('add_answer', pid=post[0])}}" method="post">
+    <form action="{{url_for('edit_answer', aid=answer[0])}}" method="post">
         {{answer_form.hidden_tag()}}
         {{answer_form.title.label}} {{answer_form.title}} <br />
         {{answer_form.text.label}} {{answer_form.text}} <br />

@@ -10,6 +10,7 @@ from forms.PostForm import PostForm
 from forms.MangePosts import ManagePosts
 from forms.AddTagForm import AddTagForm
 from forms.AnswerForm import AnswerForm
+from forms.RoleForm import RoleForm
 from flask import render_template, request, redirect, make_response, session, flash, url_for
 from EducationReviews import app
 import cx_Oracle
@@ -18,6 +19,7 @@ import dao.post_handle as ph
 import dao.category_handle as ch
 import dao.tag_handle as th
 import dao.answer_handle as ah
+import dao.role_handle as rh
 from forms.ManageUsers import ManageUsers
 from validators.credentials import check_credentials, check_hash, get_role
 import json
@@ -32,11 +34,12 @@ databaseName = "localhost:1521/xe"
 @app.route('/')
 @app.route('/home')
 def home():
-    """Renders the home page."""
+    data = ph.filter_posts()
     return render_template(
-        'index.html',
-        title='Home Page',
+        'all.html',
+        title='Feed',
         year=datetime.now().year,
+		data=data
     )
 
 @app.route('/contact')
@@ -94,9 +97,11 @@ def check():
 
 	data = uh.get_user(user_id)
 	if data == None:
-		uh.add_user(user_id,  first_name + ' ' + last_name, hash_)
+		status = uh.add_user(user_id,  first_name + ' ' + last_name, hash_)
+		if status!='ok': return render_template('404.html', error=status)
 	else:
-		uh.update_hash(user_id, hash_)
+		status = uh.update_hash(user_id, hash_)
+		if status!='ok': return render_template('404.html', error=status)
 			
 	return response
 
@@ -155,10 +160,8 @@ def manage_users_edit(uid):
 
 		if request.method == "POST":
 			if form.validate():
-				try:
-					uh.edit_user(uid, request.form['role'], request.form['name'], request.form['status'])
-				except:
-					return render_template('404.html', error = 'Something went wrong with information update')
+				status = uh.edit_user(uid, request.form['role'], request.form['name'], request.form['status'])
+				if status != 'ok': render_template('404.html', error = status)
 
 				from_url = request.args.get('from')
 				args = request.args.get('args')
@@ -172,13 +175,22 @@ def manage_users_edit(uid):
 @app.route('/manage/users/block/<uid>', methods = ["GET"])
 def manage_users_block(uid):
 	if check_hash() and get_role() == 'superuser':
-		try:
-			uh.block_user(uid)
-		except:
-			return render_template('404.html', error = 'Something went wrong during blocking')
+		status = uh.block_user(uid)
+		if status != 'ok': return render_template('404.html', error = status)
 		from_url = request.args.get('from')
 		args = request.args.get('args')
 		flash("User blocked")
+		return redirect(from_url + '?' + args)
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/users/unblock/<uid>', methods = ["GET"])
+def manage_users_unblock(uid):
+	if check_hash() and get_role() == 'superuser':
+		status = uh.unblock_user(uid)
+		if status != 'ok': return render_template('404.html', error = status)
+		from_url = request.args.get('from')
+		args = request.args.get('args')
+		flash("User unblocked")
 		return redirect(from_url + '?' + args)
 	return render_template('404.html', error = 'You have no rights for this action')
 
@@ -212,10 +224,8 @@ def manage_category_add():
 
 		if request.method == "POST":
 			if form.validate():
-				try:
-					ch.add_category(request.form['title'])
-				except:
-					return render_template('404.html', error = 'Something went wrong while creation')
+				status = ch.add_category(request.form['title'])
+				if status != 'ok' : return render_template('404.html', error = status)
 				response = make_response(redirect(url_for('manage_category')))
 				flash("Category added")
 				return response
@@ -226,10 +236,8 @@ def manage_category_add():
 @app.route('/manage/category/delete/<title>', methods = ["GET"])
 def manage_category_delete(title):
 	if check_hash() and get_role() == 'superuser':
-		try:
-			ch.delete_category(title)
-		except:
-			return render_template('404.html', error = 'Something went wrong while deletion')
+		status = ch.delete_category(title)
+		if status !='ok' : return render_template('404.html', error=status)
 		args = request.args.get('args')
 		response = make_response(redirect(url_for('manage_category') + '?' + args))
 		flash("Category deleted")
@@ -268,10 +276,8 @@ def manage_tag_add():
 
 		if request.method == "POST":
 			if form.validate():
-				try:
-					th.add_tag(request.form['title'])
-				except:
-					return render_template('404.html', error = 'Something went wrong while creation')
+				status = th.add_tag(request.form['title'])
+				if status != 'ok': return render_template('404.html', error=status)
 				response = make_response(redirect(url_for('manage_tag')))
 				flash("Tag added")
 				return response
@@ -303,12 +309,11 @@ def add_post():
 			print('help')
 			print(form.errors)
 			if form.validate():
-				try:
-					user_id = uh.filter_users(None, None, session['key'])[0][0]
-					pid = ph.add_post(user_id, request.form['title'], request.form['text'], request.form['category'])
-					return redirect(url_for('view_post', pid=pid))
-				except:
-					return render_template('404.html', error="Error while creation")
+				user_id = uh.filter_users(None, None, session['key'])[0][0]
+				pid, status = ph.add_post(user_id, request.form['title'], request.form['text'], request.form['category'])
+				if status!='ok': return render_template('404.html', error=status)
+				flash('Post added successfully')
+				return redirect(url_for('view_post', pid=pid))
 			
 			return render_template('404.html', error="Validation violated")
 	return render_template('404.html', error = 'You have no rights for this action')
@@ -316,7 +321,7 @@ def add_post():
 @app.route('/manage/posts', methods=["GET", "POST"])
 def manage_posts():
 	role = get_role()
-	if check_hash() and (role == 'superuser' or role == 'moderator'):
+	if check_hash(): #and (role == 'superuser' or role == 'moderator'):
 		form = ManagePosts()
 		categories = ch.filter_categories(None)
 		category_list = []
@@ -324,8 +329,9 @@ def manage_posts():
 			category_list.append((category[0], category[0]))
 		form.category.choices = category_list
 		if request.method == "GET":
-				
-			data = ph.filter_posts(None,None,None,None,None)
+			data = None
+			if role == 'superuser' or role == 'moderator': data = ph.filter_posts(status_=datetime.now())
+			if role == 'user': data = ph.filter_posts()
 			new_data = []
 			for rec in data:
 				new_data.append((rec[0], uh.get_user(rec[1])[2], rec[2], rec[3],rec[4],rec[5],rec[6]))
@@ -333,7 +339,7 @@ def manage_posts():
 			return render_template('posts.html', form=form, role=role, data=data)
 				
 		
-		if request.method == "POST":
+		if request.method == "POST" and (role == 'superuser' or role == 'moderator'):
 			try:
 				categories = ch.filter_categories(None)
 				category_list = []
@@ -341,11 +347,11 @@ def manage_posts():
 					category_list.append((category[0], category[0]))
 				form.category.choices = category_list
 				
-				users = uh.filter_users(None, request.form['author'], None)#[:-1][0]
-				data = ph.filter_posts(users[0][0], request.form['title'], None, request.form['category'], None)
+				users = uh.filter_users(None, request.form['author'], None)
+				data = ph.filter_posts(users[0][0], request.form['title'], None, request.form['category'], datetime.now())
 				for i in range(1,len(users)):
 					dataset = ph.filter_posts(users[i][0], request.form['title'], None, 
-								request.form['category'], NULL)
+								request.form['category'], datetime.now())
 					for part in dataset:
 						data.append(part)
 
@@ -382,12 +388,10 @@ def edit_post(pid):
 				return render_template("postform.html", form=form)
 			if request.method == "POST":
 				if form.validate():
-					try:
-						ph.edit_post(pid, request.form['title'], request.form['text'], request.form['category'])
-						flash('Post edited successfully')
-						return redirect(url_for('view_post', pid=pid))
-					except:
-						return render_template('404.html', error='Error while editing')
+					status = ph.edit_post(pid, request.form['title'], request.form['text'], request.form['category'])
+					if status!='ok': return render_template('404.html', error='Error while editing')
+					flash('Post edited successfully')
+					return redirect(url_for('view_post', pid=pid))
 			return render_template('404.html', error="Validation violated")
 	return render_template('404.html', error = 'You have no rights for this action')
 
@@ -395,12 +399,10 @@ def edit_post(pid):
 def hide_post(pid):
 	role = get_role()
 	if check_hash() and (role == 'superuser' or role == 'moderator'):
-		try:
-			ph.hide_post(pid)
-			flash("Post was hidden")
-			return redirect(url_for('manage_posts'))
-		except:
-			return render_template('404.html', error='Error while hiding')
+		status = ph.hide_post(pid)
+		if status != 'ok': return render_template('404.html', error=status)
+		flash("Post was hidden")
+		return redirect(url_for('manage_posts'))
 
 	return render_template('404.html', error = 'You have no rights for this action')
 	
@@ -408,12 +410,10 @@ def hide_post(pid):
 def publicate_post(pid):
 	role = get_role()
 	if check_hash() and (role == 'superuser' or role == 'moderator'):
-		try:
-			ph.publicate_post(pid)
-			flash("Post was published")
-			return redirect(url_for('manage_posts'))
-		except:
-			return render_template('404.html', error='Error while hiding')
+		status = ph.publicate_post(pid)
+		if status != 'ok': return render_template('404.html', error=status)
+		flash("Post was published")
+		return redirect(url_for('manage_posts'))
 
 	return render_template('404.html', error = 'You have no rights for this action')
 
@@ -422,14 +422,12 @@ def remove_post(pid):
 	role = get_role()
 	if check_hash():
 		if  (role == 'user' and ph.get_post(pid)[1] == uh.user_by_hash(session['key'])) or role=='moderator' or role=='superuser':
-			try:
-				ph.publicate_post(pid)
-				flash("Post was removed")
-				if role=='user':
-					return redirect('/')
-				return redirect(url_for('manage_posts'))
-			except:
-				return render_template('404.html', error='Error while hiding')
+			status = ph.hide_post(pid)
+			if status!='ok': return render_template('404.html', error=status)
+			flash("Post was removed")
+			if role=='user':
+				return redirect('/')
+			return redirect(url_for('manage_posts'))
 
 	return render_template('404.html', error = 'You have no rights for this action')
 
@@ -479,17 +477,17 @@ def view_post(pid):
 
 		except:
 			return render_template('404.html', error='Error while getting info')
-		if data[4] != 1 and role == 'user':
+		if data[4] == None and role == 'user':
 			return render_template('404.html', error = 'Post not found')
 		return render_template('post.html', post=data, author=author, tags=tags, answer=answer,
 						 answer_form=answer_form, tag_form=tag_form)
 
 	if request.method == "POST":
-		try:
-			if tag_form.validate(): ph.add_tag_to_post(pid, request.form['tag'])
-			else: return render_template('404.html', error="Validation violated")
-		except:
-			return render_template('404.html', error='Error while adding tag')
+		if tag_form.validate(): 
+			status = ph.add_tag_to_post(pid, request.form['tag'])
+			if status != 'ok': return render_template('404.html', error=status)
+		else: 
+			return render_template('404.html', error="Validation violated")
 						
 		return redirect(url_for('view_post', _anchor='tag', pid=pid))
 
@@ -519,11 +517,9 @@ def manage_tags(pid):
 					
 			if request.method == "POST":
 				if form.validate():
-					try:
-						ph.add_tag_to_post(pid, request.form['tag'])
-					except:
-						return render_template('404.html', error='Error while adding tag')
-						
+					status = ph.add_tag_to_post(pid, request.form['tag'])
+					if status != 'ok': return render_template('404.html', error=status)
+					
 					return redirect(url_for('manage_tags', pid=pid))
 
 				return render_template('404.html', error="Validation violated")
@@ -535,10 +531,8 @@ def remove_tag_from_post(pid, tag):
 	if check_hash():
 		role = get_role()
 		if  (role == 'user' and ph.get_post(pid)[1] == uh.user_by_hash(session['key'])) or role=='moderator' or role=='superuser':
-			try:
-				ph.delete_tag_from_post(pid, tag)
-			except:
-				return render_template('404.html', error = 'Error while deleting tag')
+			status = ph.delete_tag_from_post(pid, tag)
+			if status != 'ok': return render_template('404.html', error = status)
 			flash('Tag successfully deleted from post')
 			return redirect(url_for('view_post',_anchor='tag', pid=pid))
 
@@ -557,27 +551,65 @@ def add_answer(pid):
 
 			return render_template('answerform.html', form=form, data=post)
 		if request.method == 'POST':
-			try:
-				author = uh.user_by_hash(session['key'])[0]
-				ah.add_answer(author, pid, request.form['title'], request.form['text'])
-			except:
-				return render_template('404.html', error = 'Error while adding answer')
+			status = "ok"
+			author = uh.user_by_hash(session['key'])[0]
+			status = ah.add_answer(author, pid, request.form['title'], request.form['text'])[1]
+			if status != "ok": return render_template('404.html', error = status)
 			flash('Answer successfully added')
 			return redirect(url_for('view_post', pid=pid))
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/answer/edit/<aid>', methods=['POST'])
+def edit_answer(aid):
+	role = get_role()
+	answer = ah.get_answer(aid)
+	if check_hash() and (role == 'superuser' or (role == 'moderator' and \
+		answer[1] == uh.user_by_hash(session['key']))):
+		form = AnswerForm()
+		if form.validate():
+			status = ah.edit_answer(aid, request.form['title'], request.form['text'])
+			if status != 'ok': return render_template('404.html', error=status)
+			return redirect(url_for('view_post', pid=answer[2]))
 	return render_template('404.html', error = 'You have no rights for this action')
 
 @app.route('/answer/remove/<aid>', methods=['GET'])
 def remove_answer(aid):
 	role = get_role()
 	if check_hash() and (role == 'superuser' or role == 'moderator'):
-		pid = None
-		try:
-			pid = ah.get_answer(aid)[1]
-			ah.delete_answer(aid)
-		except:
-			return render_template('404.html', error = 'Error while deleting answer')
+		pid = ah.get_answer(aid)[2]
+		status = ah.delete_answer(aid)
+		if status != 'ok': return render_template('404.html', error=status)
 		flash('Answer successfully deleted')
 		if pid == None: return redirect('/')
 		return redirect(url_for('view_post', pid=pid))
 	return render_template('404.html', error = 'You have no rights for this action')
 
+@app.route('/manage/roles', methods=['GET', 'POST'])
+def manage_roles():
+	if check_hash() and get_role() == 'superuser':
+		form = RoleForm()
+		if method == 'GET':
+			data = rh.filter_roles()
+			return render_template('roles.html', data=data, form=form)
+		if method == 'POST':
+			if form.validate():
+				status = rh.add_role(request.form['rolename'])
+				if status != 'ok': return render_template('404.html', error=status)
+				flash('Role added')
+				return redirect(url_for('manage_roles'))
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/manage/roles/delete/<rolename>', methods=['GET'])
+def delete_role(rolename):
+	if check_hash() and get_role() == 'superuser':
+		status = rh.delete_role(rolename)
+		if status != 'ok': return render_template('404.html', error=status)
+		flash('Role deleted')
+		return redirect(url_for('manage_roles'))
+	return render_template('404.html', error = 'You have no rights for this action')
+
+@app.route('/admin')
+def admin_page():
+	role = get_role()
+	if check_hash() and (role == 'superuser' or role == 'moderator'):
+		return render_template('adminpage.html', role=role)

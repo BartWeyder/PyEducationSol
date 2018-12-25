@@ -1,27 +1,12 @@
-﻿<!DOCTYPE html>
+﻿{% extends "layout.html" %}
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
-    <h1>User</h1>
-    <table>
-        {% for dict_item in U %}
-        <tr><td>{{dict_item}}</td><td>{{U[dict_item]}}</td></tr>
-        {% endfor %}
-    </table>
-    
+{% block content %}
 
-    <br />
-    <br />
+{% for rec in data %}
+<div>
+    <h2>{{rec[2]}}</h2>
+    <a href="{{ url_for('view_post', pid=rec[0]) }}" class="btn btn-primary">View</a>
+</div>
+{% endfor %}
 
-    <h1>Post</h1>
-    <table>
-        {% for dict_item in P %}
-        <tr><td>{{dict_item}}</td><td>{{P[dict_item]}}</td></tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+{% endblock %}
