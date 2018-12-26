@@ -29,6 +29,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dao\analytics.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="dao\answer_handle.py">
       <SubType>Code</SubType>
     </Compile>
@@ -78,6 +81,9 @@
     <Compile Include="forms\UserForm.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="forms\VisualizationDatesForm.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="forms\__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -119,6 +125,7 @@
     <Content Include="EducationReviews\templates\userform.html" />
     <Content Include="EducationReviews\templates\users.html" />
     <Content Include="EducationReviews\templates\roles.html" />
+    <Content Include="EducationReviews\templates\visualization.html" />
     <Content Include="requirements.txt" />
     <Content Include="EducationReviews\static\content\bootstrap.css" />
     <Content Include="EducationReviews\static\content\bootstrap.min.css" />

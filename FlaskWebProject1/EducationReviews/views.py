@@ -11,6 +11,7 @@ from forms.MangePosts import ManagePosts
 from forms.AddTagForm import AddTagForm
 from forms.AnswerForm import AnswerForm
 from forms.RoleForm import RoleForm
+from forms.VisualizationDatesForm import VisualizationDatesForm
 from flask import render_template, request, redirect, make_response, session, flash, url_for
 from EducationReviews import app
 import cx_Oracle
@@ -20,9 +21,13 @@ import dao.category_handle as ch
 import dao.tag_handle as th
 import dao.answer_handle as ah
 import dao.role_handle as rh
+import dao.analytics as al
 from forms.ManageUsers import ManageUsers
 from validators.credentials import check_credentials, check_hash, get_role
 import json
+import plotly
+import plotly.plotly as py
+import plotly.graph_objs as go
  
 username = 'kizim'
 password = 'kizim'
@@ -613,3 +618,32 @@ def admin_page():
 	role = get_role()
 	if check_hash() and (role == 'superuser' or role == 'moderator'):
 		return render_template('adminpage.html', role=role)
+
+@app.route("/visual", methods=['GET', 'POST'])
+def visualization():
+	if check_hash():
+		form = VisualizationDatesForm()
+		if request.method == 'GET':
+			return render_template('visualization.html', form=form)
+		if request.method == 'POST':
+			raw_data= None
+			if request.form['date_from'] and request.form['date_till']:
+				raw_data = al.users_activity(request.form['date_from'], request.form['date_till'])
+			else:
+				raw_data = al.users_activity()
+			bar1 = go.Bar(
+				x=[x[0] for x in raw_data],
+				y=[x[1] for x in raw_data]
+			)
+			if request.form['date_from'] and request.form['date_till']:
+				raw_data = al.tag_use_rate(request.form['date_from'], request.form['date_till'])
+			else:
+				raw_data = al.tag_use_rate()
+			bar2 = go.Bar(
+				x=[x[0] for x in raw_data],
+				y=[x[1] for x in raw_data]
+			)
+			graphJSONBar1 = json.dumps(bar1, cls=plotly.utils.PlotlyJSONEncoder)
+			graphJSONBar2 = json.dumps(bar2, cls=plotly.utils.PlotlyJSONEncoder)
+
+			return render_template('visualization.html', form=form, graphJSONBar1=graphJSONBar1, graphJSONBar2=graphJSONBar2)

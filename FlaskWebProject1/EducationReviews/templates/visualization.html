@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistics</title>
+</head>
+<body>
+
+    <h1>Input dates</h1>
+    <form action="{{url_for('visualization')}}" method="post">
+        <fieldset>
+            {{form.hidden_tag()}}
+            {{form.date_from.label}} {{form.date_from}}
+            {{form.date_till.label}} {{form.date_till}}
+            {{form.submit}}
+        </fieldset>
+    </form>
+
+
+    <h1>User activity</h1>
+    <p>Quantity of posts by users for specified period</p>
+    <div id="user_activity"></div>
+
+    <h1>Tag popularity</h1>
+    <p>Quantity of uses per tags for specified period</p>
+    <div id="tag_rate"></div>
+</body>
+<footer>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <script type="text/javascript">
+
+        var bar1 = {{ graphJSONBar1 | safe }};
+        var bar2 = {{ graphJSONBar2 | safe }};
+        Plotly.plot('user_activity', bar1, {});
+        Plotly.plot('tag_rate', bar2, {});
+
+    </script>
+</footer>
+</html>
